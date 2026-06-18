@@ -1,0 +1,37 @@
+- README.md
+- architecture/README.md
+  - architecture/system-overview.md
+  - architecture/frontend.md
+  - architecture/data-model.md
+  - architecture/infra.md
+  - architecture/api.md
+- components/README.md
+  - components/atomic-design.md
+  - components/component-guidelines.md
+  - components/ui-library.md
+  - components/accessibility.md
+- code-organization/README.md
+  - code-organization/feature-sliced.md
+  - code-organization/nextjs-structure.md
+  - code-organization/naming-and-conventions.md
+- guides/README.md
+  - guides/getting-started.md
+  - guides/how-to-add-component.md
+  - guides/how-to-add-feature.md
+  - guides/testing.md
+- style-guide/README.md
+  - style-guide/typescript-style.md
+  - style-guide/css-tokens.md
+  - style-guide/commit-and-branching.md
+- contributing/README.md
+  - contributing/pull-request-template.md
+  - contributing/code-review.md
+  - contributing/developer-onboarding.md
+- diagrams/README.md
+  - diagrams/architecture-diagrams.md
+- reference/README.md
+  - reference/env-variables.md
+  - reference/openapi.md
+- appendices/README.md
+  - appendices/changelog.md
+  - appendices/faq.md
