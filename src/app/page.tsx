@@ -1,98 +1,120 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TopNavBar } from "@/widgets/TopNavBar";
 import { ProblemPanel } from "@/widgets/ProblemPanel";
 import { EditorPanel } from "@/widgets/EditorPanel";
 
-// Mock data matching the original HTML
-const MOCK_CHALLENGE = {
-  title: "Filter active user accounts.",
-  database: "PostgreSQL",
-  description: "Select all users who have logged in within the last 30 days.",
-};
-
-const MOCK_SCHEMA = {
-  tableName: "users",
-  columns: [
-    { name: "id", type: "int" },
-    { name: "username", type: "string" },
-    { name: "email", type: "string" },
-    { name: "last_login", type: "timestamp" },
-  ],
-};
-
-const MOCK_COLUMNS = [
-  { key: "id", header: "id" },
-  { key: "username", header: "username" },
-  { key: "email", header: "email" },
-  { key: "last_login", header: "last_login" },
-];
-
-const MOCK_INITIAL_DATA = [
-  {
-    id: 1,
-    username: "alice_jones",
-    email: "alice@example.com",
-    last_login: "2024-03-15 10:23:00",
-  },
-  {
-    id: 2,
-    username: "bob_smith",
-    email: "bob@example.com",
-    last_login: "2023-11-01 14:45:00",
-  },
-  {
-    id: 3,
-    username: "charlie_brown",
-    email: "charlie@example.com",
-    last_login: "2024-04-02 09:12:00",
-  },
-];
-
-const MOCK_EXPECTED_DATA = [
-  {
-    id: 1,
-    username: "alice_jones",
-    email: "alice@example.com",
-    last_login: "2024-03-15 10:23:00",
-  },
-  {
-    id: 3,
-    username: "charlie_brown",
-    email: "charlie@example.com",
-    last_login: "2024-04-02 09:12:00",
-  },
-];
-
-const DEFAULT_SQL = `SELECT * FROM users
-WHERE last_login > NOW() - INTERVAL '30 days';`;
-
 export default function ChallengePage() {
-  const [sql, setSql] = useState<string | undefined>(DEFAULT_SQL);
+  const [challenge, setChallenge] = useState<any>(null);
+  const [sql, setSql] = useState<string | undefined>("");
   const [output, setOutput] = useState<string | undefined>();
   const [isExecuting, setIsExecuting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleExecute = () => {
+  useEffect(() => {
+    // Fetch daily challenge on mount
+    fetch("/api/challenges/daily")
+      .then((res) => {
+        if (!res.ok) throw new Error("Could not fetch challenge");
+        return res.json();
+      })
+      .then((data) => {
+        setChallenge(data);
+        setSql(`SELECT * FROM ${data.schema.tableName}\nLIMIT 10;`);
+      })
+      .catch((err) => {
+        setOutput(`Error loading daily challenge: ${err.message}`);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  const handleExecute = async () => {
+    if (!challenge || !sql) return;
     setIsExecuting(true);
-    // Simulate execution delay
-    setTimeout(() => {
-      setOutput("Success: Query executed correctly.\nResult matches expected output.");
+    setOutput("Executing query in sandbox...");
+
+    try {
+      const response = await fetch("/api/challenges/attempt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          challengeId: challenge.id,
+          query: sql,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setOutput(`Error: ${data.error?.message || "Something went wrong"}`);
+        return;
+      }
+
+      if (data.success) {
+        setOutput(
+          `Success: Query executed correctly.\nResult matches expected output.\nExecution Time: ${data.executionTimeMs}ms`
+        );
+      } else if (data.error) {
+        setOutput(`Failed: ${data.error}\nExecution Time: ${data.executionTimeMs}ms`);
+      } else {
+        setOutput(`Incorrect: Result rows or columns do not match expected output.\nExecution Time: ${data.executionTimeMs}ms`);
+      }
+    } catch (err: any) {
+      setOutput(`Network/Service Error: ${err.message || "Failed to contact sandboxed execution API."}`);
+    } finally {
       setIsExecuting(false);
-    }, 1000);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <TopNavBar />
+        <main className="flex-grow flex items-center justify-center bg-surface-container-lowest">
+          <div className="text-xl font-medium animate-pulse text-neutral-400">Loading daily challenge...</div>
+        </main>
+      </>
+    );
+  }
+
+  if (!challenge) {
+    return (
+      <>
+        <TopNavBar />
+        <main className="flex-grow flex items-center justify-center bg-surface-container-lowest">
+          <div className="text-xl font-medium text-red-500">Failed to load challenge. Please try again.</div>
+        </main>
+      </>
+    );
+  }
+
+  // Map backend columns to TableColumn type expected by ProblemPanel
+  const dataColumns = challenge.schema.columns.map((col: any) => ({
+    key: col.name,
+    header: col.name,
+  }));
 
   return (
     <>
       <TopNavBar />
       <main className="flex-grow flex flex-col lg:flex-row w-full overflow-hidden">
         <ProblemPanel
-          challenge={MOCK_CHALLENGE}
-          schema={MOCK_SCHEMA}
+          challenge={{
+            title: challenge.title,
+            database: challenge.database,
+            description: challenge.description,
+          }}
+          schema={{
+            tableName: challenge.schema.tableName,
+            columns: challenge.schema.columns,
+          }}
           dataViewer={{
-            columns: MOCK_COLUMNS,
-            initialData: MOCK_INITIAL_DATA,
-            expectedData: MOCK_EXPECTED_DATA,
+            columns: dataColumns,
+            initialData: challenge.initialData,
+            expectedData: challenge.initialData, // Set expectedData fallback to initialData schema preview
           }}
         />
         <EditorPanel
