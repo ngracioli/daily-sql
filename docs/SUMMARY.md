@@ -5,6 +5,8 @@
   - architecture/data-model.md
   - architecture/infra.md
   - architecture/api.md
+  - architecture/api-spec.md
+  - architecture/execution-sandbox.md
 - components/README.md
   - components/atomic-design.md
   - components/component-guidelines.md
