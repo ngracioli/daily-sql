@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button, Icon, Avatar, Badge } from "@/shared/ui";
+import { Avatar } from "@/shared/ui";
 
 export function TopNavBar() {
   return (
@@ -22,9 +22,6 @@ export function TopNavBar() {
         </Link>
       </nav>
       <div className="flex items-center gap-md">
-        <Button variant="icon">
-          <Icon name="settings" />
-        </Button>
         <Avatar src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2g1gMHfC70nyMA4DD9qml1zp-9Lf2YAaTbCaXUZf_7ZWoDjPr-qBblbgxO9sps0xKuOqGVb1YoqeEB7J1WhiuxsHvV4BgyL-9KGUB3g-m17PxonDARZhEx9N9oXcSSQMbC_1mrScAKvXwszlYe1502jnmHmKGBXHHAsPOiD-XfBTdtycLWg7OYqQQ1GxIDbOHTgr17FpTuVxYQCpZjxGJiY6EyrA-gH_odlHbkfEZXCq-V6RFIcG_WrPo5PMo03JjoA76NluRIhha" />
       </div>
     </header>
