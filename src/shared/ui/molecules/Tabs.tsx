@@ -11,11 +11,22 @@ export interface TabItem {
 export interface TabsProps {
   tabs: TabItem[];
   defaultTabId?: string;
+  activeTabId?: string;
+  onTabChange?: (id: string) => void;
   className?: string;
 }
 
-export function Tabs({ tabs, defaultTabId, className = "" }: TabsProps) {
-  const [activeTab, setActiveTab] = useState(defaultTabId || tabs[0]?.id);
+export function Tabs({ tabs, defaultTabId, activeTabId, onTabChange, className = "" }: TabsProps) {
+  const [localActiveTab, setLocalActiveTab] = useState(defaultTabId || tabs[0]?.id);
+  const activeTab = activeTabId !== undefined ? activeTabId : localActiveTab;
+
+  const handleTabClick = (id: string) => {
+    if (onTabChange) {
+      onTabChange(id);
+    } else {
+      setLocalActiveTab(id);
+    }
+  };
 
   return (
     <div className={`flex flex-col gap-sm flex-grow ${className}`}>
@@ -25,7 +36,7 @@ export function Tabs({ tabs, defaultTabId, className = "" }: TabsProps) {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabClick(tab.id)}
               className={`pb-2 border-b-2 text-label-sm font-label-sm transition-colors ${
                 isActive
                   ? "border-[#171717] text-[#171717] font-bold"

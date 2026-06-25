@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { TopNavBar } from "@/widgets/TopNavBar";
 import { ProblemPanel } from "@/widgets/ProblemPanel";
 import { EditorPanel } from "@/widgets/EditorPanel";
+import { TableColumn } from "@/shared/ui";
 
 export default function ChallengePage() {
   const [challenge, setChallenge] = useState<any>(null);
@@ -11,6 +12,13 @@ export default function ChallengePage() {
   const [output, setOutput] = useState<string | undefined>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // States for query results visualization
+  const [activeTab, setActiveTab] = useState<string>("initial");
+  const [userColumns, setUserColumns] = useState<TableColumn[] | null>(null);
+  const [userData, setUserData] = useState<any[] | null>(null);
+  const [expectedColumns, setExpectedColumns] = useState<TableColumn[] | null>(null);
+  const [expectedData, setExpectedData] = useState<any[] | null>(null);
 
   useEffect(() => {
     // Fetch daily challenge on mount
@@ -50,7 +58,30 @@ export default function ChallengePage() {
 
       if (!response.ok) {
         setOutput(`Error: ${data.error?.message || "Something went wrong"}`);
+        setUserColumns(null);
+        setUserData(null);
+        setExpectedColumns(null);
+        setExpectedData(null);
         return;
+      }
+
+      // Update output columns and rows if available
+      if (data.userFields) {
+        setUserColumns(data.userFields.map((f: any) => ({ key: f.name, header: f.name })));
+      } else {
+        setUserColumns(null);
+      }
+      setUserData(data.results);
+
+      if (data.solutionFields) {
+        setExpectedColumns(data.solutionFields.map((f: any) => ({ key: f.name, header: f.name })));
+      } else {
+        setExpectedColumns(null);
+      }
+      setExpectedData(data.expectedResults);
+
+      if (data.results) {
+        setActiveTab("user");
       }
 
       if (data.success) {
@@ -64,6 +95,10 @@ export default function ChallengePage() {
       }
     } catch (err: any) {
       setOutput(`Network/Service Error: ${err.message || "Failed to contact sandboxed execution API."}`);
+      setUserColumns(null);
+      setUserData(null);
+      setExpectedColumns(null);
+      setExpectedData(null);
     } finally {
       setIsExecuting(false);
     }
@@ -112,9 +147,14 @@ export default function ChallengePage() {
             columns: challenge.schema.columns,
           }}
           dataViewer={{
-            columns: dataColumns,
+            initialColumns: dataColumns,
             initialData: challenge.initialData,
-            expectedData: challenge.initialData, // Set expectedData fallback to initialData schema preview
+            expectedColumns: expectedColumns || undefined,
+            expectedData: expectedData || undefined,
+            userColumns: userColumns || undefined,
+            userData: userData || undefined,
+            activeTabId: activeTab,
+            onTabChange: setActiveTab,
           }}
         />
         <EditorPanel

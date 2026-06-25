@@ -105,7 +105,9 @@ export async function POST(req: NextRequest) {
         error: comparison.message,
         executionTimeMs: sandboxOutcome.executionTimeMs,
         results: sandboxOutcome.userResults.rows,
+        userFields: sandboxOutcome.userResults.fields,
         expectedResults: sandboxOutcome.solutionResults.rows,
+        solutionFields: sandboxOutcome.solutionResults.fields,
       });
     }
 

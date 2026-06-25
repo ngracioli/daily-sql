@@ -14,9 +14,14 @@ export interface ProblemPanelProps {
     columns: ColumnDef[];
   };
   dataViewer: {
-    columns: TableColumn[];
-    initialData: Record<string, React.ReactNode>[];
-    expectedData: Record<string, React.ReactNode>[];
+    initialColumns: TableColumn[];
+    initialData: Record<string, any>[];
+    expectedColumns?: TableColumn[];
+    expectedData?: Record<string, any>[];
+    userColumns?: TableColumn[];
+    userData?: Record<string, any>[];
+    activeTabId?: string;
+    onTabChange?: (id: string) => void;
   };
 }
 
