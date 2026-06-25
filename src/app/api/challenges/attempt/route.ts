@@ -102,7 +102,10 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: comparison.success,
+        reason: comparison.reason || null,
         error: comparison.message,
+        expected: comparison.expected || null,
+        received: comparison.received || null,
         executionTimeMs: sandboxOutcome.executionTimeMs,
         results: sandboxOutcome.userResults.rows,
         userFields: sandboxOutcome.userResults.fields,

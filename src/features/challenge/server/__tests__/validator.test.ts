@@ -25,6 +25,9 @@ describe("SQL Result Set Validator", () => {
 
     const result = compareResultSets(userRows, solutionRows, [{ name: "id" }], solutionFields, true);
     expect(result.success).toBe(false);
+    expect(result.reason).toBe("COLUMN_MISMATCH");
+    expect(result.expected?.columns).toEqual(["id", "username"]);
+    expect(result.received?.columns).toEqual(["id"]);
     expect(result.message).toContain("Schema mismatch");
   });
 
@@ -40,7 +43,27 @@ describe("SQL Result Set Validator", () => {
       true
     );
     expect(result.success).toBe(false);
+    expect(result.reason).toBe("COLUMN_MISMATCH");
+    expect(result.expected?.columns).toEqual(["id", "username"]);
+    expect(result.received?.columns).toEqual(["id", "name"]);
     expect(result.message).toContain("Column mismatch");
+  });
+
+  it("should fail when row counts mismatch", () => {
+    const solutionRows = [
+      { id: 1, username: "alice" },
+      { id: 2, username: "bob" },
+    ];
+    const userRows = [
+      { id: 1, username: "alice" },
+    ];
+
+    const result = compareResultSets(userRows, solutionRows, userFields, solutionFields, true);
+    expect(result.success).toBe(false);
+    expect(result.reason).toBe("ROW_COUNT_MISMATCH");
+    expect(result.expected?.rowCount).toBe(2);
+    expect(result.received?.rowCount).toBe(1);
+    expect(result.message).toContain("Result mismatch: Expected 2 rows");
   });
 
   it("should compare ordered records strictly", () => {
@@ -55,6 +78,9 @@ describe("SQL Result Set Validator", () => {
 
     const result = compareResultSets(userRows, solutionRows, userFields, solutionFields, true);
     expect(result.success).toBe(false);
+    expect(result.reason).toBe("ROW_DATA_MISMATCH");
+    expect(result.expected?.rows).toEqual(solutionRows);
+    expect(result.received?.rows).toEqual(userRows);
     expect(result.message).toContain("Result mismatch: Row data at index 1 does not match");
   });
 

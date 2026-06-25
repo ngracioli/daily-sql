@@ -1,6 +1,17 @@
 export interface VerificationResult {
   success: boolean;
+  reason?: "COLUMN_MISMATCH" | "ROW_COUNT_MISMATCH" | "ROW_DATA_MISMATCH" | null;
   message: string | null;
+  expected?: {
+    columns?: string[];
+    rowCount?: number;
+    rows?: any[];
+  } | null;
+  received?: {
+    columns?: string[];
+    rowCount?: number;
+    rows?: any[];
+  } | null;
 }
 
 /**
@@ -60,7 +71,14 @@ export function compareResultSets(
   if (userFields.length !== solutionFields.length) {
     return {
       success: false,
+      reason: "COLUMN_MISMATCH",
       message: `Schema mismatch: Expected ${solutionFields.length} columns, but query returned ${userFields.length}.`,
+      expected: {
+        columns: solutionFields.map((f) => f.name),
+      },
+      received: {
+        columns: userFields.map((f) => f.name),
+      },
     };
   }
 
@@ -71,7 +89,14 @@ export function compareResultSets(
     if (expectedName !== userName) {
       return {
         success: false,
+        reason: "COLUMN_MISMATCH",
         message: `Column mismatch: Column index ${i + 1} was expected to be '${expectedName}', but returned '${userName}'.`,
+        expected: {
+          columns: solutionFields.map((f) => f.name),
+        },
+        received: {
+          columns: userFields.map((f) => f.name),
+        },
       };
     }
   }
@@ -80,7 +105,14 @@ export function compareResultSets(
   if (userRows.length !== solutionRows.length) {
     return {
       success: false,
+      reason: "ROW_COUNT_MISMATCH",
       message: `Result mismatch: Expected ${solutionRows.length} rows, but query returned ${userRows.length}.`,
+      expected: {
+        rowCount: solutionRows.length,
+      },
+      received: {
+        rowCount: userRows.length,
+      },
     };
   }
 
@@ -91,7 +123,14 @@ export function compareResultSets(
       if (!areRowsEqual(userRows[i], solutionRows[i])) {
         return {
           success: false,
+          reason: "ROW_DATA_MISMATCH",
           message: `Result mismatch: Row data at index ${i + 1} does not match the expected solution.`,
+          expected: {
+            rows: solutionRows,
+          },
+          received: {
+            rows: userRows,
+          },
         };
       }
     }
@@ -114,7 +153,14 @@ export function compareResultSets(
       if (solutionFrequencies[key] !== userFrequencies[key]) {
         return {
           success: false,
+          reason: "ROW_DATA_MISMATCH",
           message: "Result mismatch: The returned rows do not match the expected dataset.",
+          expected: {
+            rows: solutionRows,
+          },
+          received: {
+            rows: userRows,
+          },
         };
       }
     }
