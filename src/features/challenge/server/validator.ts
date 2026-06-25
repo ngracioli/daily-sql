@@ -25,7 +25,7 @@ function normalizeRow(row: any): string {
       // String looks like a timestamp, normalize to ISO/UTC string if it parses
       try {
         value = new Date(value).toISOString();
-      } catch (_) {}
+      } catch {}
     }
     
     // Coerce numeric strings/numbers to floats for comparison stability
