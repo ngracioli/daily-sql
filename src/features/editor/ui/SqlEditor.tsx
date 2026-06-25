@@ -1,15 +1,39 @@
 "use client";
 
+import { useEffect } from "react";
 import { Editor } from "@monaco-editor/react";
 import { Button, Icon } from "@/shared/ui";
+import { registerSqlAutocompleteProvider, SchemaContext } from "../model/autocomplete";
 
 export interface SqlEditorProps {
   value: string;
   onChange: (value: string | undefined) => void;
   fileName?: string;
+  tableName?: string;
+  columns?: string[];
 }
 
-export function SqlEditor({ value, onChange, fileName = "Solution.sql" }: SqlEditorProps) {
+const schemaContext: SchemaContext = {
+  tableName: undefined,
+  columns: undefined,
+};
+
+export function SqlEditor({
+  value,
+  onChange,
+  fileName = "Solution.sql",
+  tableName,
+  columns,
+}: SqlEditorProps) {
+  useEffect(() => {
+    schemaContext.tableName = tableName;
+    schemaContext.columns = columns;
+  }, [tableName, columns]);
+
+  const handleEditorDidMount = (editor: any, monaco: any) => {
+    registerSqlAutocompleteProvider(monaco, schemaContext);
+  };
+
   return (
     <div className="flex-grow flex flex-col p-lg gap-md border-b border-[#ebebeb]">
       <div className="flex justify-between items-center">
@@ -27,6 +51,7 @@ export function SqlEditor({ value, onChange, fileName = "Solution.sql" }: SqlEdi
           theme="vs-dark"
           value={value}
           onChange={onChange}
+          onMount={handleEditorDidMount}
           options={{
             minimap: { enabled: false },
             fontSize: 14,

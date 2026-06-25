@@ -9,6 +9,8 @@ export interface EditorPanelProps {
   onExecute: () => void;
   consoleOutput?: string;
   isExecuting?: boolean;
+  tableName?: string;
+  columns?: string[];
 }
 
 export function EditorPanel({
@@ -17,10 +19,17 @@ export function EditorPanel({
   onExecute,
   consoleOutput,
   isExecuting,
+  tableName,
+  columns,
 }: EditorPanelProps) {
   return (
     <div className="w-full lg:w-1/2 h-full flex flex-col bg-[#fafafa]">
-      <SqlEditor value={sqlValue} onChange={onSqlChange} />
+      <SqlEditor
+        value={sqlValue}
+        onChange={onSqlChange}
+        tableName={tableName}
+        columns={columns}
+      />
       <ExecutionConsole
         onExecute={onExecute}
         output={consoleOutput}

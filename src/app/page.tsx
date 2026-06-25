@@ -163,6 +163,8 @@ export default function ChallengePage() {
           onExecute={handleExecute}
           consoleOutput={output}
           isExecuting={isExecuting}
+          tableName={challenge?.schema?.tableName}
+          columns={challenge?.schema?.columns?.map((c: any) => c.name)}
         />
       </main>
     </>
