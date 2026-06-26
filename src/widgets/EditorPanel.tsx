@@ -1,7 +1,7 @@
 "use client";
 
 import { SqlEditor } from "@/features/editor/ui/SqlEditor";
-import { ExecutionConsole } from "@/features/editor/ui/ExecutionConsole";
+import { ExecutionConsole, QueryHistoryEntry } from "@/features/editor/ui/ExecutionConsole";
 
 export interface EditorPanelProps {
   sqlValue: string;
@@ -11,6 +11,8 @@ export interface EditorPanelProps {
   isExecuting?: boolean;
   tableName?: string;
   columns?: string[];
+  history: QueryHistoryEntry[];
+  onRestoreQuery: (query: string) => void;
 }
 
 export function EditorPanel({
@@ -21,6 +23,8 @@ export function EditorPanel({
   isExecuting,
   tableName,
   columns,
+  history,
+  onRestoreQuery,
 }: EditorPanelProps) {
   return (
     <div className="w-full lg:w-1/2 h-full flex flex-col bg-[#fafafa]">
@@ -34,7 +38,10 @@ export function EditorPanel({
         onExecute={onExecute}
         output={consoleOutput}
         isExecuting={isExecuting}
+        history={history}
+        onRestoreQuery={onRestoreQuery}
       />
     </div>
   );
 }
+

@@ -5,6 +5,8 @@ import { TopNavBar } from "@/widgets/TopNavBar";
 import { ProblemPanel } from "@/widgets/ProblemPanel";
 import { EditorPanel } from "@/widgets/EditorPanel";
 import { TableColumn } from "@/shared/ui";
+import { Confetti } from "@/features/challenge/ui/Confetti";
+import { QueryHistoryEntry } from "@/features/editor/ui/ExecutionConsole";
 
 export default function ChallengePage() {
   const [challenge, setChallenge] = useState<any>(null);
@@ -20,6 +22,10 @@ export default function ChallengePage() {
   const [expectedColumns, setExpectedColumns] = useState<TableColumn[] | null>(null);
   const [expectedData, setExpectedData] = useState<any[] | null>(null);
 
+  // States for UX enhancements (History and Celebration)
+  const [history, setHistory] = useState<QueryHistoryEntry[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
+
   useEffect(() => {
     // Fetch daily challenge on mount
     fetch("/api/challenges/daily")
@@ -30,6 +36,18 @@ export default function ChallengePage() {
       .then((data) => {
         setChallenge(data);
         setSql(`SELECT * FROM ${data.schema.tableName}\nLIMIT 10;`);
+
+        // Load history from localStorage
+        const storedHistory = localStorage.getItem(`dailysql:history:${data.id}`);
+        if (storedHistory) {
+          try {
+            setHistory(JSON.parse(storedHistory));
+          } catch {
+            setHistory([]);
+          }
+        } else {
+          setHistory([]);
+        }
       })
       .catch((err) => {
         setOutput(`Error loading daily challenge: ${err.message}`);
@@ -38,6 +56,16 @@ export default function ChallengePage() {
         setIsLoading(false);
       });
   }, []);
+
+  // Timer to automatically turn off confetti after 5 seconds
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
 
   const handleExecute = async () => {
     if (!challenge || !sql) return;
@@ -84,10 +112,25 @@ export default function ChallengePage() {
         setActiveTab("user");
       }
 
+      // Log attempt to Query History
+      if (data.success !== undefined) {
+        const newEntry: QueryHistoryEntry = {
+          id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+          query: sql,
+          success: data.success,
+          timestamp: new Date().toLocaleTimeString(),
+          executionTimeMs: data.executionTimeMs,
+        };
+        const updatedHistory = [newEntry, ...history].slice(0, 20);
+        setHistory(updatedHistory);
+        localStorage.setItem(`dailysql:history:${challenge.id}`, JSON.stringify(updatedHistory));
+      }
+
       if (data.success) {
         setOutput(
           `Success: Query executed correctly.\nResult matches expected output.\nExecution Time: ${data.executionTimeMs}ms`
         );
+        setShowConfetti(true);
       } else if (data.error) {
         setOutput(`Failed: ${data.error}\nExecution Time: ${data.executionTimeMs}ms`);
       } else {
@@ -135,6 +178,7 @@ export default function ChallengePage() {
   return (
     <>
       <TopNavBar />
+      {showConfetti && <Confetti />}
       <main className="flex-grow flex flex-col lg:flex-row w-full overflow-hidden">
         <ProblemPanel
           challenge={{
@@ -165,9 +209,12 @@ export default function ChallengePage() {
           isExecuting={isExecuting}
           tableName={challenge?.schema?.tableName}
           columns={challenge?.schema?.columns?.map((c: any) => c.name)}
+          history={history}
+          onRestoreQuery={setSql}
         />
       </main>
     </>
   );
 }
+
 
