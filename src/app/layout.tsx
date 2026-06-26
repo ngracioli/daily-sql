@@ -27,12 +27,6 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${jetbrainsMono.variable}`}
     >
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="h-screen w-full flex flex-col overflow-hidden bg-[#fafafa] font-body-md text-on-surface">
         {children}
       </body>

@@ -5,6 +5,7 @@ export interface AvatarProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 
 export function Avatar({ src, alt = "User avatar", className = "", ...props }: AvatarProps) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt}

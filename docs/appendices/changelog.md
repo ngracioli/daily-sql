@@ -18,6 +18,14 @@ Use this file for repository-level change notes if you do not maintain a separat
   - Added a "Restore" button that loads previous query snippets back into Monaco.
 - **Success Celebration Canvas Animation**:
   - Created a custom Canvas Confetti particle explosion component (`Confetti.tsx`) using requestAnimationFrame to render smooth 60fps physics-based celebration bursts upon successful challenge resolution.
+- **Multi-Table Schema & Data Visualization**:
+  - Refactored the database schema seeds (`init-db.sql`) to store multi-table schema columns and initial datasets as JSON objects.
+  - Implemented dynamic normalization inside `challenges-data.ts` mapper to transform single-table and multi-table JSON properties into a unified dictionary structure.
+  - Updated autocomplete to suggest each table name (`Struct` kind) and their columns (`Field` kind) with table name indicators.
+  - Redesigned `SchemaViewer` to render all challenge tables in styled grids and `DataViewer` to display selection pill buttons allowing users to switch between viewing different initial datasets.
+- **Immediate Expected Result Display**:
+  - Refactored the GET daily challenge endpoint to execute the solution query inside the database sandbox on load and return the expected query results directly.
+  - Updated the page component to load the expected columns and results states on mount, showing the correct target outputs inside the **Expected Result** tab immediately without waiting for query execution.
 - **Dynamic SQL Output & Schema Visualization**:
   - Refactored `DataViewer` to support different columns and data sets across three separate views: **Initial Data**, **Expected Result**, and **Your Result**.
   - Dynamic mapping and rendering of user execution rows and columns to show mismatch errors clearly (e.g. 4 columns returned instead of 3).
