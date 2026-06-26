@@ -17,6 +17,10 @@ Use this file for repository-level change notes if you do not maintain a separat
   - Organized autocomplete constants and logic into `src/features/editor/model/autocomplete.ts` following Feature-Sliced Design guidelines.
 - **Developer & Agent Onboarding Guide (`AGENT.md`)**:
   - Created a comprehensive `/init` onboarding reference file mapping the repository's FSD guidelines, directory structure, sandbox security requirements, lint instructions, and build/test quick-links.
+- **Múltiplos Desafios & Rotação Diária**:
+  - Adicionados dois novos desafios de SQL (`101` e `102`) englobando consultas de filtros de pedidos e junções de clientes inativos.
+  - Implementada lógica em `getDailyChallenge()` para selecionar e rotacionar o desafio de forma automática baseada no dia do ano.
+  - Criados testes de unidade em `src/features/challenge/server/__tests__/challenges-data.test.ts` cobrindo o contrato dos desafios e a lógica de rotação diária.
 - **Distributed Redis Rate Limiter**:
   - Added a `redis:7-alpine` service to `docker-compose.yml` to store rate-limit metrics.
   - Installed `ioredis` and implemented a production-grade sliding window rate-limiter inside `src/features/challenge/server/rate-limit.ts` using an atomic Lua script (`EVAL`) in exactly one network round trip.
