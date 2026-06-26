@@ -12,6 +12,12 @@ Use this file for repository-level change notes if you do not maintain a separat
   - Refactored `src/features/challenge/server/challenges-data.ts` to asynchronously fetch challenges from the database using `dbPool` and calculate daily rotation dynamically.
   - Removed static in-memory `CHALLENGES` map to optimize node server memory footprint.
   - Implemented unit tests for the asynchronous methods `getDailyChallenge()` and `getChallengeById(id)` with a mocked `dbPool.query` interface in `challenges-data.test.ts`.
+- **Interactive Local Query History**:
+  - Implemented client-side query logs persistence using `localStorage`, isolated per challenge ID (`dailysql:history:${challengeId}`).
+  - Integrated `Tabs` inside `ExecutionConsole` to view past attempts alongside console output.
+  - Added a "Restore" button that loads previous query snippets back into Monaco.
+- **Success Celebration Canvas Animation**:
+  - Created a custom Canvas Confetti particle explosion component (`Confetti.tsx`) using requestAnimationFrame to render smooth 60fps physics-based celebration bursts upon successful challenge resolution.
 - **Dynamic SQL Output & Schema Visualization**:
   - Refactored `DataViewer` to support different columns and data sets across three separate views: **Initial Data**, **Expected Result**, and **Your Result**.
   - Dynamic mapping and rendering of user execution rows and columns to show mismatch errors clearly (e.g. 4 columns returned instead of 3).
