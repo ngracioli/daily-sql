@@ -17,8 +17,14 @@ Use this file for repository-level change notes if you do not maintain a separat
   - Organized autocomplete constants and logic into `src/features/editor/model/autocomplete.ts` following Feature-Sliced Design guidelines.
 - **Developer & Agent Onboarding Guide (`AGENT.md`)**:
   - Created a comprehensive `/init` onboarding reference file mapping the repository's FSD guidelines, directory structure, sandbox security requirements, lint instructions, and build/test quick-links.
+- **Distributed Redis Rate Limiter**:
+  - Added a `redis:7-alpine` service to `docker-compose.yml` to store rate-limit metrics.
+  - Installed `ioredis` and implemented a hybrid rate-limiter in `src/shared/lib/rate-limit.ts` utilizing `INCR` / `EXPIRE` commands, with automatic in-memory sliding window fallback.
+  - Wrapped connection pools globally to prevent connection leaks during Next.js hot-reloads.
 
 ### Changed
+- **Asynchronous Rate Limiting**:
+  - Migrated `checkRateLimit` and route handlers to be asynchronous to support non-blocking network calls.
 - **ESLint & Quality Updates**:
   - Disabled `@typescript-eslint/no-explicit-any` rules in flat ESLint config (`eslint.config.mjs`) to allow `any` / dynamic record typing for database query rows.
   - Cleaned up parameterless catches (`catch {}`) in `validator.ts` to resolve linter warnings.

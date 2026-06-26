@@ -3,13 +3,36 @@ import { CHALLENGES } from "@/features/challenge/server/challenges-data";
 import { sanitizeSQL } from "@/features/challenge/server/sanitizer";
 import { runInSandbox } from "@/features/challenge/server/runner";
 import { compareResultSets } from "@/features/challenge/server/validator";
+import { checkRateLimit } from "@/features/challenge/server/rate-limit";
 
 export async function POST(req: NextRequest) {
+  // 1. Rate limiting check
+  const rateLimit = await checkRateLimit(req);
+  if (!rateLimit.isAllowed) {
+    const retryAfterSeconds = Math.ceil(rateLimit.resetMs / 1000);
+    return NextResponse.json(
+      {
+        error: {
+          code: "RATE_LIMIT_EXCEEDED",
+          message: `Too many attempts. Please wait ${retryAfterSeconds} second(s) before trying again.`,
+        },
+      },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(rateLimit.limit),
+          "X-RateLimit-Remaining": String(rateLimit.remaining),
+          "Retry-After": String(retryAfterSeconds),
+        },
+      }
+    );
+  }
+
   try {
     const body = await req.json();
     const { challengeId, query } = body;
 
-    // 1. Basic validation
+    // 2. Basic validation
     if (challengeId === undefined || typeof challengeId !== "number") {
       return NextResponse.json(
         {
