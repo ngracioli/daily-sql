@@ -61,9 +61,9 @@ describe("Daily Challenge Data & Rotation", () => {
     expect(challenge.id).toBe(mockChallenges[0].id);
     expect(challenge.title).toBe(mockChallenges[0].title);
     expect(challenge.description).toBe(mockChallenges[0].description);
-    expect(challenge.schema.tableName).toBe("users");
-    expect(challenge.schema.columns.length).toBeGreaterThan(0);
-    expect(challenge.initialData.length).toBeGreaterThan(0);
+    expect(challenge.schema.tables["users"]).toBeDefined();
+    expect(challenge.schema.tables["users"].length).toBeGreaterThan(0);
+    expect(challenge.initialData["users"]).toBeDefined();
     expect(challenge.schemaSql).toBeDefined();
     expect(challenge.seedSql).toBeDefined();
     expect(challenge.solutionSql).toBeDefined();

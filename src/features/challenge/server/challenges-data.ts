@@ -8,10 +8,9 @@ export interface ChallengeDefinition {
   difficulty: "Easy" | "Medium" | "Hard";
   database: string;
   schema: {
-    tableName: string;
-    columns: { name: string; type: string }[];
+    tables: Record<string, { name: string; type: string }[]>;
   };
-  initialData: Record<string, any>[];
+  initialData: Record<string, Record<string, any>[]>;
   schemaSql: string;
   seedSql: string;
   solutionSql: string;
@@ -19,6 +18,21 @@ export interface ChallengeDefinition {
 }
 
 function mapRowToChallenge(row: any): ChallengeDefinition {
+  let tables: Record<string, { name: string; type: string }[]> = {};
+  let initialData: Record<string, any[]> = {};
+
+  if (Array.isArray(row.schema_columns)) {
+    tables[row.schema_table_name] = row.schema_columns;
+  } else if (row.schema_columns && typeof row.schema_columns === "object") {
+    tables = row.schema_columns;
+  }
+
+  if (Array.isArray(row.initial_data)) {
+    initialData[row.schema_table_name] = row.initial_data;
+  } else if (row.initial_data && typeof row.initial_data === "object") {
+    initialData = row.initial_data;
+  }
+
   return {
     id: row.id,
     title: row.title,
@@ -27,10 +41,9 @@ function mapRowToChallenge(row: any): ChallengeDefinition {
     difficulty: row.difficulty as "Easy" | "Medium" | "Hard",
     database: row.database,
     schema: {
-      tableName: row.schema_table_name,
-      columns: row.schema_columns,
+      tables,
     },
-    initialData: row.initial_data,
+    initialData,
     schemaSql: row.schema_sql,
     seedSql: row.seed_sql,
     solutionSql: row.solution_sql,

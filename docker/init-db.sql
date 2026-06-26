@@ -88,9 +88,13 @@ ON CONFLICT (id) DO UPDATE SET
 
 INSERT INTO challenges (id, title, description, category, difficulty, database, schema_table_name, schema_columns, initial_data, schema_sql, seed_sql, solution_sql, check_order)
 VALUES
-(102, 'Find inactive customers.', 'Select the id and name of customers who have never placed any orders. Order the results by customer id in ascending order.', 'Joins & Subqueries', 'Medium', 'PostgreSQL', 'customers',
- '[{"name": "id", "type": "integer"}, {"name": "name", "type": "varchar(100)"}, {"name": "country", "type": "varchar(50)"}]'::jsonb,
- '[{"id": 1, "name": "Alice", "country": "USA"}, {"id": 2, "name": "Bob", "country": "Canada"}, {"id": 3, "name": "Charlie", "country": "UK"}]'::jsonb,
+(102, 'Find inactive customers.', 'Select the id and name of customers who have never placed any orders. Order the results by customer id in ascending order.
+
+Available Tables:
+* customers: id (integer), name (varchar), country (varchar)
+* orders: id (integer), customer_id (integer), total_amount (numeric)', 'Joins & Subqueries', 'Medium', 'PostgreSQL', 'customers',
+ '{"customers": [{"name": "id", "type": "integer"}, {"name": "name", "type": "varchar(100)"}, {"name": "country", "type": "varchar(50)"}], "orders": [{"name": "id", "type": "integer"}, {"name": "customer_id", "type": "integer"}, {"name": "total_amount", "type": "numeric(10,2)"}]}'::jsonb,
+ '{"customers": [{"id": 1, "name": "Alice", "country": "USA"}, {"id": 2, "name": "Bob", "country": "Canada"}, {"id": 3, "name": "Charlie", "country": "UK"}], "orders": [{"id": 1, "customer_id": 1, "total_amount": 50.00}, {"id": 2, "customer_id": 3, "total_amount": 120.00}]}'::jsonb,
  'CREATE TABLE customers (id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, country VARCHAR(50) NOT NULL); CREATE TABLE orders (id SERIAL PRIMARY KEY, customer_id INTEGER NOT NULL, total_amount NUMERIC(10,2) NOT NULL);',
  'INSERT INTO customers (id, name, country) VALUES (1, ''Alice'', ''USA''), (2, ''Bob'', ''Canada''), (3, ''Charlie'', ''UK''); INSERT INTO orders (id, customer_id, total_amount) VALUES (1, 1, 50.00), (2, 3, 120.00);',
  'SELECT c.id, c.name FROM customers c LEFT JOIN orders o ON c.id = o.customer_id WHERE o.customer_id IS NULL ORDER BY c.id ASC;',
