@@ -19,7 +19,9 @@ Use this file for repository-level change notes if you do not maintain a separat
   - Created a comprehensive `/init` onboarding reference file mapping the repository's FSD guidelines, directory structure, sandbox security requirements, lint instructions, and build/test quick-links.
 - **Distributed Redis Rate Limiter**:
   - Added a `redis:7-alpine` service to `docker-compose.yml` to store rate-limit metrics.
-  - Installed `ioredis` and implemented a hybrid rate-limiter in `src/shared/lib/rate-limit.ts` utilizing `INCR` / `EXPIRE` commands, with automatic in-memory sliding window fallback.
+  - Installed `ioredis` and implemented a production-grade sliding window rate-limiter inside `src/features/challenge/server/rate-limit.ts` using an atomic Lua script (`EVAL`) in exactly one network round trip.
+  - Features connection status checking via native ioredis state (`redisClient.status === "ready"`) and namespace isolation (`rl:v1:attempt:${ip}`).
+  - Built a memory-safe in-memory fallback sliding window limiter with a background cleanup interval (`setInterval` with `.unref()`) to prevent resource leaks during local development.
   - Wrapped connection pools globally to prevent connection leaks during Next.js hot-reloads.
 
 ### Changed
