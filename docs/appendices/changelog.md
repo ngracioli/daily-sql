@@ -50,10 +50,13 @@ Use this file for repository-level change notes if you do not maintain a separat
 ### Changed
 - **Asynchronous Challenge Endpoints**:
   - Updated daily challenge route (`/api/challenges/daily`) and query attempt route (`/api/challenges/attempt`) to fetch metadata dynamically from the PostgreSQL database using `async/await`.
-- **Setup Instructions (README.md)**:
+- **Setup Instructions & Docker configuration (README.md / docker-compose.yml)**:
   - Updated configuration guide with detailed instructions for running database and Redis services via Docker Compose, verifying status, manual table seeding, and database volume resets.
-- **Asynchronous Rate Limiting**:
-  - Migrated `checkRateLimit` and route handlers to be asynchronous to support non-blocking network calls.
-- **ESLint & Quality Updates**:
+  - Removed the obsolete `version` attribute from `docker-compose.yml` to prevent compose warnings.
+- **State Derivation Optimization**:
+  - Replaced the synchronization `useEffect` inside `DataViewer.tsx` with derived state variables to calculate the active table dynamically. This resolves ESLint `set-state-in-effect` rule warnings and eliminates cascading renders.
+- **Next.js & ESLint Quality Updates**:
+  - Resolved `no-page-custom-font` warning in layout by removing `<link>` tags and loading Google fonts via standard CSS `@import` in `globals.css`.
+  - Suppressed generic image LCP warning on standard `<img />` tags inside the reusable `Avatar.tsx` component.
   - Disabled `@typescript-eslint/no-explicit-any` rules in flat ESLint config (`eslint.config.mjs`) to allow `any` / dynamic record typing for database query rows.
   - Cleaned up parameterless catches (`catch {}`) in `validator.ts` to resolve linter warnings.
