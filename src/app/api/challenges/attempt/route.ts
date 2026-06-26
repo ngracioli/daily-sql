@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CHALLENGES } from "@/features/challenge/server/challenges-data";
+import { getChallengeById } from "@/features/challenge/server/challenges-data";
 import { sanitizeSQL } from "@/features/challenge/server/sanitizer";
 import { runInSandbox } from "@/features/challenge/server/runner";
 import { compareResultSets } from "@/features/challenge/server/validator";
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Fetch challenge definition
-    const challenge = CHALLENGES[challengeId];
+    const challenge = await getChallengeById(challengeId);
     if (!challenge) {
       return NextResponse.json(
         {

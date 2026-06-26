@@ -7,6 +7,11 @@ Use this file for repository-level change notes if you do not maintain a separat
 ## [2026-06-25]
 
 ### Added
+- **Database Persistence for SQL Challenges**:
+  - Modeled challenge metadata in the primary PostgreSQL database (`dailysql`).
+  - Refactored `src/features/challenge/server/challenges-data.ts` to asynchronously fetch challenges from the database using `dbPool` and calculate daily rotation dynamically.
+  - Removed static in-memory `CHALLENGES` map to optimize node server memory footprint.
+  - Implemented unit tests for the asynchronous methods `getDailyChallenge()` and `getChallengeById(id)` with a mocked `dbPool.query` interface in `challenges-data.test.ts`.
 - **Dynamic SQL Output & Schema Visualization**:
   - Refactored `DataViewer` to support different columns and data sets across three separate views: **Initial Data**, **Expected Result**, and **Your Result**.
   - Dynamic mapping and rendering of user execution rows and columns to show mismatch errors clearly (e.g. 4 columns returned instead of 3).
@@ -29,6 +34,10 @@ Use this file for repository-level change notes if you do not maintain a separat
   - Wrapped connection pools globally to prevent connection leaks during Next.js hot-reloads.
 
 ### Changed
+- **Asynchronous Challenge Endpoints**:
+  - Updated daily challenge route (`/api/challenges/daily`) and query attempt route (`/api/challenges/attempt`) to fetch metadata dynamically from the PostgreSQL database using `async/await`.
+- **Setup Instructions (README.md)**:
+  - Updated configuration guide with detailed instructions for running database and Redis services via Docker Compose, verifying status, manual table seeding, and database volume resets.
 - **Asynchronous Rate Limiting**:
   - Migrated `checkRateLimit` and route handlers to be asynchronous to support non-blocking network calls.
 - **ESLint & Quality Updates**:

@@ -3,7 +3,7 @@ import { getDailyChallenge } from "@/features/challenge/server/challenges-data";
 
 export async function GET() {
   try {
-    const challenge = getDailyChallenge();
+    const challenge = await getDailyChallenge();
     
     // Explicitly return only necessary user-facing fields to prevent cheating
     const userFacingChallenge = {
