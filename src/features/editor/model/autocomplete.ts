@@ -9,8 +9,7 @@ export const SQL_KEYWORDS = [
 let isCompletionProviderRegistered = false;
 
 export interface SchemaContext {
-  tableName?: string;
-  columns?: string[];
+  tables?: Record<string, string[]>;
 }
 
 /**
@@ -34,28 +33,27 @@ export function registerSqlAutocompleteProvider(
         endColumn: word.endColumn,
       };
 
-      const suggestions = [];
+      const suggestions: any[] = [];
 
-      // 1. Suggest active challenge table
-      if (schemaContext.tableName) {
-        suggestions.push({
-          label: schemaContext.tableName,
-          kind: monaco.languages.CompletionItemKind.Struct,
-          insertText: schemaContext.tableName,
-          detail: "Table",
-          range: range,
-        });
-      }
-
-      // 2. Suggest active challenge columns
-      if (schemaContext.columns) {
-        schemaContext.columns.forEach((col) => {
+      // 1. Suggest active challenge tables and columns
+      if (schemaContext.tables) {
+        Object.entries(schemaContext.tables).forEach(([tableName, columns]) => {
           suggestions.push({
-            label: col,
-            kind: monaco.languages.CompletionItemKind.Field,
-            insertText: col,
-            detail: "Column",
+            label: tableName,
+            kind: monaco.languages.CompletionItemKind.Struct,
+            insertText: tableName,
+            detail: "Table",
             range: range,
+          });
+
+          columns.forEach((col) => {
+            suggestions.push({
+              label: col,
+              kind: monaco.languages.CompletionItemKind.Field,
+              insertText: col,
+              detail: `Column (${tableName})`,
+              range: range,
+            });
           });
         });
       }

@@ -9,26 +9,22 @@ export interface SqlEditorProps {
   value: string;
   onChange: (value: string | undefined) => void;
   fileName?: string;
-  tableName?: string;
-  columns?: string[];
+  tables?: Record<string, string[]>;
 }
 
 const schemaContext: SchemaContext = {
-  tableName: undefined,
-  columns: undefined,
+  tables: undefined,
 };
 
 export function SqlEditor({
   value,
   onChange,
   fileName = "Solution.sql",
-  tableName,
-  columns,
+  tables,
 }: SqlEditorProps) {
   useEffect(() => {
-    schemaContext.tableName = tableName;
-    schemaContext.columns = columns;
-  }, [tableName, columns]);
+    schemaContext.tables = tables;
+  }, [tables]);
 
   const handleEditorDidMount = (editor: any, monaco: any) => {
     registerSqlAutocompleteProvider(monaco, schemaContext);

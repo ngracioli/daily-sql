@@ -9,8 +9,7 @@ export interface EditorPanelProps {
   onExecute: () => void;
   consoleOutput?: string;
   isExecuting?: boolean;
-  tableName?: string;
-  columns?: string[];
+  tables?: Record<string, string[]>;
   history: QueryHistoryEntry[];
   onRestoreQuery: (query: string) => void;
 }
@@ -21,8 +20,7 @@ export function EditorPanel({
   onExecute,
   consoleOutput,
   isExecuting,
-  tableName,
-  columns,
+  tables,
   history,
   onRestoreQuery,
 }: EditorPanelProps) {
@@ -31,8 +29,7 @@ export function EditorPanel({
       <SqlEditor
         value={sqlValue}
         onChange={onSqlChange}
-        tableName={tableName}
-        columns={columns}
+        tables={tables}
       />
       <ExecutionConsole
         onExecute={onExecute}
