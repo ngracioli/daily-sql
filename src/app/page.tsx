@@ -35,7 +35,17 @@ export default function ChallengePage() {
       })
       .then((data) => {
         setChallenge(data);
-        setSql(`SELECT * FROM ${data.schema.tableName}\nLIMIT 10;`);
+        
+        const firstTable = Object.keys(data.schema.tables)[0] || "users";
+        setSql(`SELECT * FROM ${firstTable}\nLIMIT 10;`);
+
+        // Set expected columns and rows from response if available
+        if (data.expectedFields) {
+          setExpectedColumns(data.expectedFields.map((f: any) => ({ key: f.name, header: f.name })));
+        }
+        if (data.expectedResults) {
+          setExpectedData(data.expectedResults);
+        }
 
         // Load history from localStorage
         const storedHistory = localStorage.getItem(`dailysql:history:${data.id}`);
@@ -169,11 +179,13 @@ export default function ChallengePage() {
     );
   }
 
-  // Map backend columns to TableColumn type expected by ProblemPanel
-  const dataColumns = challenge.schema.columns.map((col: any) => ({
-    key: col.name,
-    header: col.name,
-  }));
+  // Formulate autocomplete context tables format
+  const autocompleteTables: Record<string, string[]> = {};
+  if (challenge?.schema?.tables) {
+    Object.entries(challenge.schema.tables).forEach(([tName, cols]: any) => {
+      autocompleteTables[tName] = cols.map((c: any) => c.name);
+    });
+  }
 
   return (
     <>
@@ -187,12 +199,11 @@ export default function ChallengePage() {
             description: challenge.description,
           }}
           schema={{
-            tableName: challenge.schema.tableName,
-            columns: challenge.schema.columns,
+            tables: challenge.schema.tables,
           }}
           dataViewer={{
-            initialColumns: dataColumns,
             initialData: challenge.initialData,
+            initialTablesSchema: challenge.schema.tables,
             expectedColumns: expectedColumns || undefined,
             expectedData: expectedData || undefined,
             userColumns: userColumns || undefined,
@@ -207,8 +218,7 @@ export default function ChallengePage() {
           onExecute={handleExecute}
           consoleOutput={output}
           isExecuting={isExecuting}
-          tableName={challenge?.schema?.tableName}
-          columns={challenge?.schema?.columns?.map((c: any) => c.name)}
+          tables={autocompleteTables}
           history={history}
           onRestoreQuery={setSql}
         />

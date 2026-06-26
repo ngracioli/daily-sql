@@ -10,12 +10,11 @@ export interface ProblemPanelProps {
     description: string;
   };
   schema: {
-    tableName: string;
-    columns: ColumnDef[];
+    tables: Record<string, ColumnDef[]>;
   };
   dataViewer: {
-    initialColumns: TableColumn[];
-    initialData: Record<string, any>[];
+    initialData: Record<string, Record<string, any>[]>;
+    initialTablesSchema: Record<string, ColumnDef[]>;
     expectedColumns?: TableColumn[];
     expectedData?: Record<string, any>[];
     userColumns?: TableColumn[];
@@ -36,3 +35,4 @@ export function ProblemPanel({ challenge, schema, dataViewer }: ProblemPanelProp
     </div>
   );
 }
+

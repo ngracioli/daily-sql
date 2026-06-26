@@ -21,7 +21,7 @@ export function ProblemDescription({
           <Badge variant="outline">{database}</Badge>
         </div>
       </div>
-      <p className="text-body-md font-body-md text-on-surface-variant">
+      <p className="text-body-md font-body-md text-on-surface-variant whitespace-pre-wrap">
         {description}
       </p>
     </>
